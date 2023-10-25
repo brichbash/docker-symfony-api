@@ -4,29 +4,61 @@
 #-------------------------------------------------------------------------------#
 version: "1.0"
 
-#Specify inspection profile for code analysis
+# Specify inspection profile for code analysis, see .idea/inspectionProfiles/
 profile:
-  name: qodana.recommended
+    name: qodana.recommended
+    #name: Project Default
 
-#Enable inspections
+# Enable inspections
 #include:
-#  - name: <SomeEnabledInspectionId>
+#    - name: PhpCoverageInspection
 
-#Disable inspections
+# Disable inspections
 exclude:
-  - name: All
-    paths:
-      - reports
+    - name: All
+      paths:
+          - .phpunit.cache
+          - .qodana
+          - config
+          - docker
+          - docs
+          - migrations
+          - public/check.php
+          - public/bundles
+          - reports
+          - src/General/Infrastructure/Service/ElasticsearchService.php
+          - src/General/Domain/Doctrine/DBAL/Types/RealEnumType.php
+          - templates
+          - tools
+          - translations
+          - var
+          - vendor
+    # phpcs do not support readonly class yet
+    - name: PhpClassCanBeReadonlyInspection
+    # You can disable code coverage report if you don't need it
+    - name: PhpCoverageInspection
+    # Waiting https://youtrack.jetbrains.com/issue/QD-7397/It-is-not-a-problem-Can-be-replaced-with-array
+    - name: PhpPluralMixedCanBeReplacedWithArrayInspection
+    - name: SpellCheckingInspection
+    - name: CheckDependencyLicenses
+    - name: PhpMultipleClassDeclarationsInspection
+    #- name: HttpUrlsUsage
 
 php:
-  version: 8.2 #(Applied in CI/CD pipeline)
+    version: 8.2 #(Applied in CI/CD pipeline)
 
-#Execute shell command before Qodana execution (Applied in CI/CD pipeline)
-#bootstrap: sh ./prepare-qodana.sh
+# Execute shell command before Qodana execution (Applied in CI/CD pipeline)
+# Waiting fix for https://youtrack.jetbrains.com/issue/QD-6891/Plugins-cannot-be-installed-with-qodana.yaml
+bootstrap: |
+    cp -r .qodana/plugins/. /opt/idea/plugins/
 
-#Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
-#plugins:
-#  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
+# Install IDE plugins before Qodana execution (Applied in CI/CD), id can be found at https://plugins.jetbrains.com
+plugins:
+    - id: de.espend.idea.php.annotation
+    - id: com.kalessil.phpStorm.phpInspectionsEA
+    - id: de.espend.idea.php.toolbox
+    - id: fr.adrienbrault.idea.symfony2plugin
+#    - id: com.jetbrains.restClient
 
-#Specify Qodana linter for analysis (Applied in CI/CD pipeline)
+# Specify Qodana linter for analysis (Applied in CI/CD)
 linter: jetbrains/qodana-php:latest
